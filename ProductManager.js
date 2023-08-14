@@ -1,69 +1,87 @@
-class ProductManager {
-    #products;
-    static idCounter = 0;
+import fs from 'fs'
 
-    constructor(title, description, price, thumbnail, code, stock) {
-        //Inicializo la lista de productos y el contador de IDs
-        this.#products = [];
-        this.title = title;
-        this.description = description;
-        this.price = price;
-        this.thumbnail = thumbnail;
-        this.code = code;
-        this.stock = stock;
+export class ProductManager {
+    #_path
+    #_products = []
+    constructor( path ){
+        this.#_path = path;
+        this.#init()
     }
 
-    // Agrego un producto a la lista de productos
-    addProduct(title, description, price, thumbnail, code, stock) {
-        if (title == undefined || description == undefined || price == undefined || thumbnail == undefined || code == undefined || stock == undefined)
-            return console.log("Todos los campos son obligatorios");
+    async #init(){
+        if ( !fs.existsSync( this.#_path ) ) 
+            await fs.promises.writeFile( this.#_path, JSON.stringify([], null, 2) )
+    }
 
-        if (this.#products.find(p => p.code === code))
-            return console.log("Ya existe un producto con este codigo");
+    #createId(){
+        let id = this.#_products.length + 1 
+        const lastProd = this.#_products[this.#_products.length - 1]?.id
+        return this.#_products.some( p => p.id === id ) ? lastProd + 1 : id;
+    }
 
-        const newProduct = {
+    async #addProdJSON(){
+        await fs.promises.writeFile(this.#_path, JSON.stringify(this.#_products, null, 2) )
+    }
+
+    async addProduct( product ){
+        const {
             title,
             description,
             price,
             thumbnail,
             code,
-            stock,
-            id: ++ProductManager.idCounter
-        };
-
-        this.#products.push(newProduct);
-
-        return console.log("Producto Añadido");
+            stock
+        } = product
+        if ( !title || !description || !price || !thumbnail || !code || !stock ) throw new Error('Must submit all required fields')
+        if ( this.#_products.some( p => p.code === code ) ) throw new Error(`Code: ${ code } must be unique, now is repetead!`)
+        product.id = this.#createId()
+        this.#_products.push( product )
+        await this.#addProdJSON()
+        return product
     }
 
-    // Devuelve la lista completa de productos
-    getProducts() {
-        return console.log(this.#products);
-    }
+    getProducts = () => this.#_products;
 
-    // Devuelve el producto que tiene el ID especificado
-    getProductById(pid) {
-        if (this.#products.find(p => p.id === pid)) {
-            const productFound = this.#products.find(p => p.id === pid);
-            return console.log(productFound);
+    getProductsById = ( id ) => {
+        const prod = this.#_products.find( p => p.id === id );
+        if( !prod ) throw new Error( `Don´t found the id: ${ id }`);
+        return prod
+    }
+    
+    updateProduct( id, product){
+        const {
+            title,
+            description,
+            price,
+            thumbnail,
+            code,
+            stock
+        } = product
+        if ( !id && !title && !description && !price && !thumbnail && !code && !stock ) throw new Error( 'At least one valid property within an object is required to update: like = {title: "Hello World", price: 27}')
+
+        const productUpdate = this.getProductsById( id );
+        console.log( 'a',productUpdate )
+        let newProduct = {}
+        for( const prop in productUpdate ){
+            newProduct[prop] = product[prop] || productUpdate[prop]
         }
-        return console.log("No existe un producto con ese id");
+
+        this.#_products = this.#_products.map( p => {
+            if(p.id === id) return p = newProduct;
+            return p
+        })
+        
+        this.#addProdJSON()
+        return this.#_products
+    }
+
+    async deleteProduct( id ) {
+        
+        if (!this.#_products.find( p => p.id === id )) throw new Error( `Don´t found the id: ${ id }` )
+        
+        this.#_products = this.#_products.filter( p => {
+            return p.id !== id
+        })
+        
     }
 }
-
-const productManager = new ProductManager();
-
-productManager.addProduct("Mancuerna", "Articulo de gimnasia", "2500", "/images/gimansio.png", "1", 5);
-productManager.addProduct("Colchoneta de gimnasia", "Articulo de gimnasia", "1500", "/images/gimansio.png", "2", 5);
-productManager.addProduct("Pesa rusa", "Articulo de gimnasia", "3500", "/images/gimansio.png", "4", 5);
-productManager.addProduct("Barra de gimnasio", "Articulo de gimnasia", "3000", "/images/gimansio.png", "5", 5);
-productManager.addProduct("Disco de pesa", "Articulo de gimnasia", "7620", "/images/gimansio.png", "6", 5);
-productManager.addProduct("Banco inclinable", "Articulo de gimnasia", "4000", "/images/gimansio.png", "7", 5);
-productManager.addProduct("Guantes deportivos", "Articulo de gimnasia", "700", "/images/gimansio.png", "8", 5);
-productManager.addProduct("Conjunto de ropa deportiva", "Articulo de gimnasia", "10000", "/images/gimansio.png", "9", 5);
-
-// Muestra la lista completa de productos
-//console.log(productManager.getProducts())
-
-// Busca y muestra el producto con ID 1
-//console.log( productManager.getProductById(1));
