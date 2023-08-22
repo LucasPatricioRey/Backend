@@ -77,3 +77,5 @@ export class ProductManager {
         return products;
     }
 }
+
+export default ProductManager;
