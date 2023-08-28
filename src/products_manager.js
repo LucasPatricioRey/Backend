@@ -1,4 +1,4 @@
-import fs from 'fs'
+import fs from 'fs';
 
 export class ProductManager {
     #_path;
@@ -29,11 +29,14 @@ export class ProductManager {
     }
 
     async addProduct( product ){
-        const { title, description, price, thumbnail, code, stock } = product
-        if ( !title || !description || !price || !thumbnail || !code || !stock ) throw new Error('Must submit all required fields')
+        const { id, title, description, price, thumbnail=["Sin Imagen"], code, stock, category, status=true } = product
+        if ( id ) throw "Don't try to send an ID in the body, because it will be auto-incremented";
+        if ( !title || !description || !price || !code || !stock || !category ) throw 'Must submit all required fields'
         const products = await this.#prodJSON()
-        if (products.some( p => p.code === code )) throw new Error(`Code: ${ code } must be unique, now is repetead!`);
+        if (products.some( p => p.code === code )) throw `Code: ${ code } must be unique, now is repetead!`;
 
+        product.thumbnail = thumbnail
+        product.status = status
         product.id = await this.generateId()
         await this.#prodJSON( product )
         return product
@@ -44,38 +47,37 @@ export class ProductManager {
     getProductsById = async( id ) => {
         const products = await this.#prodJSON()
         const product = products.find( p => p.id === id )
-        if ( !product ) throw new Error( `DIN´T FOUND A PRODUCT WITH ID: ${ id }`)
+        if ( !product ) throw `DIN´T FOUND A PRODUCT WITH ID: ${ id }`
 
         return product
     }
     
     async updateProduct( id, product){
-        const { title, description, price, thumbnail, code, stock } = product
-        if ( !id || (!title && !description && !price && !thumbnail && !code && !stock) ) throw new Error('Must be an ID and property to change like => {stock:222, description: "Hello World"}')
-        let products = await this.#prodJSON()
+        //! ERROR HANDLER
+        const { title, description, price, thumbnail, code, stock, category, status=true } = product
+        if ( product.id ) throw 'Don´t have to send an ID in the body petition'
+        if ( !id || ( !title && !description && !price && !thumbnail && !code && !stock && !category ) ) throw 'Must be an ID and property to change like => {stock:222, description: "Hello World"}'
+        const products = await this.#prodJSON();
         const isRepeteadCode = products.some( p => p.code === code )
-        if ( isRepeteadCode ) throw new Error( `Code must be unique: ${ code }` )
+        if ( isRepeteadCode ) throw `Code must be unique: ${ code }`
+        const indexProd = products.findIndex( p => p.id === id )
+        if ( indexProd  < 0 ) throw `Din't found the ID: ${ id }`
+        
+        //? SOULUTION
+        for ( const prop in products[indexProd] ) {
+            products[indexProd][prop] = product[prop] ?? products[indexProd][prop]
+        }
 
-        const newProd = {}
-        const newProducts = products.map( p => {
-            if ( p.id === id ) {
-                for ( const prop in p ) newProd[prop] = product[prop] || p[prop];
-                return newProd;
-            }
-            return p
-        })
-        await this.#prodJSON( null, newProducts )
-        return newProducts
+        await this.#prodJSON( null, products )
+        return products
     }
 
     async deleteProduct( id ) {
         let products = await this.getProducts()
-        if ( !products.some( p => p.id === id )) throw new Error(`ID: ${ id } not found`);
+        if ( !products.some( p => p.id === id )) throw `ID: ${ id } not found`;
 
         products = products.filter( p => p.id !== id )
         await this.#prodJSON( null, products )
         return products;
     }
 }
-
-export default ProductManager;

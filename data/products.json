@@ -3,54 +3,78 @@
     "title": "Mancuerna",
     "description": "Producto de gimnasio",
     "price": 2000,
-    "thumbnail": "../img/img-1.png",
+    "thumbnail": [
+      "../img/img-1.png"
+    ],
     "code": "abc123",
+    "status": true,
     "stock": 25,
+    "category": "accesorio",
     "id": 1
   },
   {
     "title": "Colchoneta",
     "description": "Producto de gimnasio",
     "price": 200,
-    "thumbnail": "../img/img-2.png",
+    "thumbnail": [
+      "../img/img-2.png"
+    ],
     "code": "abc1234",
+    "status": true,
     "stock": 10,
+    "category": "accesorio",
     "id": 2
   },
   {
     "title": "Guantes",
     "description": "Producto de gimnasio",
     "price": 300,
-    "thumbnail": "../img/img-3.png",
+    "thumbnail": [
+      "../img/img-3.png"
+    ],
     "code": "abc12345",
+    "status": true,
     "stock": 30,
+    "category": "accesorio",
     "id": 3
   },
   {
     "title": "Discos",
     "description": "Producto de gimnasio",
     "price": 1000,
-    "thumbnail": "../img/img-4.png",
+    "thumbnail": [
+      "../img/img-4.png"
+    ],
     "code": "abc12346",
+    "status": true,
     "stock": 25,
+    "category": "accesorio",
     "id": 4
   },
   {
     "title": "Cuerda para saltar",
     "description": "Producto de gimnasio",
     "price": 500,
-    "thumbnail": "../img/img-5.png",
+    "thumbnail": [
+      "../img/img-5.png"
+    ],
     "code": "abc12347",
+    "status": true,
     "stock": 15,
+    "category": "accesorio",
     "id": 5
   },
   {
     "title": "Zapatos de gimnasio",
     "description": "Producto de gimnasio",
     "price": 1150,
-    "thumbnail": "../img/img-6.png",
+    "thumbnail": [
+      "../img/img-6.png"
+    ],
     "code": "abc12348",
+    "status": true,
     "stock": 40,
+    "category": "accesorio",
     "id": 6
   }
 ]
