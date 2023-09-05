@@ -1,5 +1,6 @@
 import fs from 'fs';
 
+
 export class ProductManager {
     #_path;
     constructor( path ){
@@ -29,13 +30,14 @@ export class ProductManager {
     }
 
     async addProduct( product ){
-        const { id, title, description, price, thumbnail=["Sin Imagen"], code, stock, category, status=true } = product
+        const { id, title, description, price, thumbnail, code, stock, category, status=true } = product
         if ( id ) throw "Don't try to send an ID in the body, because it will be auto-incremented";
         if ( !title || !description || !price || !code || !stock || !category ) throw 'Must submit all required fields'
+        if( typeof price !== 'number' || typeof stock !== 'number' || typeof status !== 'boolean' ) throw 'Must send a the correct type for each field'
         const products = await this.#prodJSON()
         if (products.some( p => p.code === code )) throw `Code: ${ code } must be unique, now is repetead!`;
 
-        product.thumbnail = thumbnail
+        product.thumbnail = thumbnail.length === 0 ? ["Sin Imagen"] : thumbnail;
         product.status = status
         product.id = await this.generateId()
         await this.#prodJSON( product )
@@ -53,7 +55,7 @@ export class ProductManager {
     }
     
     async updateProduct( id, product){
-        //! ERROR HANDLER
+        
         const { title, description, price, thumbnail, code, stock, category, status=true } = product
         if ( product.id ) throw 'Don´t have to send an ID in the body petition'
         if ( !id || ( !title && !description && !price && !thumbnail && !code && !stock && !category ) ) throw 'Must be an ID and property to change like => {stock:222, description: "Hello World"}'
@@ -63,7 +65,7 @@ export class ProductManager {
         const indexProd = products.findIndex( p => p.id === id )
         if ( indexProd  < 0 ) throw `Din't found the ID: ${ id }`
         
-        //? SOULUTION
+        
         for ( const prop in products[indexProd] ) {
             products[indexProd][prop] = product[prop] ?? products[indexProd][prop]
         }

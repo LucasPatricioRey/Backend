@@ -1,16 +1,33 @@
 import express from 'express'
-import productsRouter from './routers/products.router.js'
+import handlebars from 'express-handlebars'
 import cartsRouter from './routers/cart.router.js'
+import productsRouter from './routers/products.router.js'
+import viewRouter from './routers/view.router.js'
+import { Server } from 'socket.io'
 
 const app = express()
 
 app.use( express.json() )
-app.use('/home' ,express.static('./public'))
-
-app.use('/api/products', productsRouter)
-app.use('/api/carts', cartsRouter)
-
+app.engine( 'handlebars', handlebars.engine() )
+app.set( 'views', './src/views' )
+app.set( 'view engine', 'handlebars' )
 
 
+app.use( express.static('./src/public') )
 
-app.listen( 8080, () => console.log('SERVER OPEN!')) 
+
+app.use( '/products/', viewRouter )
+app.use( '/api/products', productsRouter )
+app.use( '/api/carts', cartsRouter ) 
+
+
+const httpServer = app.listen( 8080, () => console.log('SERVER UP!!')) 
+const io = new Server( httpServer )
+
+
+io.on('connection', socket => {
+    console.log(`Nuevo cliente conectado ${ socket.id}`) 
+    socket.on('productList', data => {
+        io.emit( 'updatedProducts', data )
+    })
+})

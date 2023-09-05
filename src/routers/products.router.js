@@ -6,15 +6,18 @@ const productManager = new ProductManager( routProductJSON );
 
 const router = Router();
 
+
+
 router.get("/", async (req, res) => {
   try {
     const result = await productManager.getProducts();
     const limit = req.query.limit;
-    res.status(200).json({ products: result.slice(0, limit) });
-  } catch (err) {
+    res.status(200).json({ payload: result.slice(0, limit) });
+  } catch ( err ) {
     res
       .status(500)
       .json({
+        status: 'error',
         error: err,
         description: "No se encuentran los products por el momento",
       });
@@ -25,19 +28,19 @@ router.get("/:pid", async (req, res) => {
   const id = parseInt(req.params.pid);
   try {
     const result = await productManager.getProductsById(id);
-    return res.status(200).json({ playload: result });
+    return res.status(200).json({ payload: result });
   } catch (err) {
-    return res.status(400).send({ error: err });
+    return res.status(400).send({ status: 'error', error: err });
   }
 });
 
 router.post("/", async (req, res) => {
   try {
     const product = req.body;
-    await productManager.addProduct(product);
-    res.status(200).json(product);
+    await productManager.addProduct( product );
+    res.status(200).json( product );
   } catch (err) {
-    res.status(400).send({ error: err });
+    res.status(400).send({ status: 'error', error: err });
   }
 });
 
@@ -48,19 +51,18 @@ router.put("/:pid", async (req, res) => {
     await productManager.updateProduct(id, product);
     res.json(product);
   } catch (err) {
-    res.status(400).send({ error: err });
+    res.status(400).send({ status: 'error', error: err });
   }
 });
 
 router.delete("/:pid", async (req, res) => {
   const id = +req.params.pid;
   try {
-    await productManager.deleteProduct(id);
-    res.json({ playload: `Product ID: ${id} was successfully removed` });
+    const products = await productManager.deleteProduct(id);
+    res.json({ payload: products });
   } catch (err) {
-    res.status(400).send({ error: err });
+    res.status(400).send({ status: 'error', error: err });
   }
 });
 
 export default router;
-

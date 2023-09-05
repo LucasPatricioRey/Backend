@@ -12,12 +12,12 @@ export class Carts_manager{
     }
 
     async #init(){
-        //? CREA UN [] EN EL FILE SI NO EXISTE 
+        
         if ( !fs.existsSync( this.#pathCartJSON ) ) return await fs.promises.writeFile( this.#pathCartJSON, JSON.stringify([], null, 2) )
-        //? CREA UN [] SI ES UN ARCHIVO VACIO 
+        
         const data = await fs.promises.readFile( this.#pathCartJSON, 'utf-8')
         if ( ( data.length === 0 ) ) return await fs.promises.writeFile( this.#pathCartJSON, JSON.stringify([], null, 2) )
-        //? REESCRIBE UN [] EN EL FILE SI ES OTRO TIPO DE DATO QUE NO SEA UN ARRAY
+        
         if( data.length > 0 ) {
             const carts = JSON.parse( data );
             if( !Array.isArray(carts) ) return await fs.promises.writeFile( this.#pathCartJSON, JSON.stringify([], null, 2) )
@@ -39,10 +39,8 @@ export class Carts_manager{
         await fs.promises.writeFile( this.#pathCartJSON, JSON.stringify( cart, null, 2 ) )
         return cart;
     }
-
-    
     async addToCart( cid, pid ){
-        //? ERRORS HANDLER
+        
         const carts = JSON.parse(await fs.promises.readFile(this.#pathCartJSON, 'utf-8'));
         const cartIndex = carts.findIndex( cart => cart.id === cid );
         if ( cartIndex < 0 ) throw `Din't found the CartID: ${ cid }`
@@ -73,7 +71,7 @@ export class Carts_manager{
 
     getCartById = async ( id ) => {
         const cart = JSON.parse( await fs.promises.readFile( this.#pathCartJSON, 'utf-8' ) )
-    .find( cart => cart.id === id )
+        .find( cart => cart.id === id )
         
         if( !cart ) throw `Din´t found ID: ${ id }`;
         return cart;
