@@ -1,43 +1,99 @@
 <div class="container">
-    <div class="mb-4">
-        <h1>ADD PRODUCT</h1>
-        <hr />
-        
-        <form id="createForm">
-        
-            <label for="title">Título:</label>
-            <input type="text" id="title" name="title" required><br>
+    <div class="d-flex justify-content-around">
+        <div class="mb-4">
+            <h1>AGREGAR PRODUCTO</h1>
+            <hr />
+            
+            <form id="createForm" enctype="multipart/form-data">
+            
+                <label for="title">Título:</label>
+                <input type="text" id="title" name="title" required><br>
 
-            <label for="description">Descripción:</label>
-            <input class="form-control w-50" type="text" id="description" name="description" required><br>
+                <label for="description">Descripción:</label>
+                <input class="form-control w-50" type="text" id="description" name="description" required><br>
 
-            <label for="price">Precio:</label>
-            <input type="number" id="price" name="price" min="0" required><br>
+                <label for="price">Precio:</label>
+                <input type="number" id="price" name="price" min="0" required><br>
 
-            <label for="code">Código:</label>
-            <input type="text" id="code" name="code" required><br>
+                <label for="code">Código:</label>
+                <input type="text" id="code" name="code" required><br>
 
-            <label for="stock">Stock:</label>
-            <input type="number" id="stock" name="stock" min="0" required><br>
+                <label for="stock">Stock:</label>
+                <input type="number" id="stock" name="stock" min="0" required><br>
 
-            <label for="category">Categoría:</label>
-            <select id="category" name="category">
-                <option value="accesorio">accesorio</option>
-                <option value="Otro">Otro accesorio</option>
-            </select><br>
+                <label for="category">Categoría:</label>
+                <select id="category" name="category">
+                    <option value="accesorio">accesorio</option>
+                    <option value="Otra cosa">Otra cosa</option>
+                </select><br>
 
-            <label for="status">Estado:</label>
-            <select id="status" name="status">
-                <option value="true">Verdadero</option>
-                <option value="false">Falso</option>
-            </select><br>
+                <label for="status">Estado:</label>
+                <select id="status" name="status">
+                    <option value="true">Verdadero</option>
+                    <option value="false">Falso</option>
+                </select><br>
 
-            <label for="thumbnail">Imagen:</label>
-            <input class="mb-3" type="file" id="thumbnail" name="thumbnail"><br>
-        </form>
-        
-            <button id="createBtn" class="btn btn-success" >Agregar producto</button>
+                <label for="thumbnail">Imagen:</label>
+                <input class="mb-3" type="file" id="thumbnail" name="thumbnail"><br>
 
+            </form>
+            
+                <button id="createBtn" class="btn btn-success" >Agregar producto</button>
+
+        </div>
+
+        <div class="mb-4">
+            <h1>ACTUALIZAR PRODUCTO</h1>
+            <hr />
+            
+            <form id="createFormUpdate" enctype="multipart/form-data">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <label for="codeUpdate">Código:</label>
+                        <input type="text" id="codeUpdate" name="code" required><br>
+                    </div>
+                    <div id="isCode" class="me-5">
+                        NO
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-bookmark-x-fill" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M2 15.5V2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.74.439L8 13.069l-5.26 2.87A.5.5 0 0 1 2 15.5zM6.854 5.146a.5.5 0 1 0-.708.708L7.293 7 6.146 8.146a.5.5 0 1 0 .708.708L8 7.707l1.146 1.147a.5.5 0 1 0 .708-.708L8.707 7l1.147-1.146a.5.5 0 0 0-.708-.708L8 6.293 6.854 5.146z"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <label for="titleUpdate">Título:</label>
+                <input type="text" id="titleUpdate" name="title" required><br>
+
+                <label for="descriptionUpdate">Descripción:</label>
+                <input class="form-control w-50" type="text" id="descriptionUpdate" name="description" required><br>
+
+                <label for="priceUpdate">Precio:</label>
+                <input type="number" id="priceUpdate" name="price" min="0" required><br>
+
+
+                <label for="stockUpdate">Stock:</label>
+                <input type="number" id="stockUpdate" name="stock" min="0" required><br>
+
+                <label for="categoryUpdate">Categoría:</label>
+                <select id="categoryUpdate" name="category">
+                    <option value="accesorio">accesorio</option>
+                    <option value="Otra cosa">Otra cosa</option>
+                    
+                </select><br>
+
+                <label for="statusUpdate">Estado:</label>
+                <select id="statusUpdate" name="status">
+                    <option value="true">Verdadero</option>
+                    <option value="false">Falso</option>
+                </select><br>
+
+                <label for="thumbnailUpdate">Imagen:</label>
+                <input class="mb-3" type="file" id="thumbnailUpdate" name="thumbnail"><br>
+
+            </form>
+            
+                <button id="createBtnUpdate" class="btn btn-success" >Actualizar producto</button>
+
+        </div>
     </div>
 
     <table class="table table-striped-columns">
@@ -58,7 +114,7 @@
         <tbody id="tBody">
             {{#each products}}
                 <tr>
-                    <td><button onclick="deleteProduct({{this.id}})" class="btn btn-outline-danger">Remove</button></td>
+                    <td><button onclick="deleteProduct('{{this._id}}')" class="btn btn-outline-danger">Remove</button></td>
                     <td>{{this.title}}</td>
                     <td>{{this.description}}</td>
                     <td>{{this.price}}</td>
@@ -67,9 +123,16 @@
                     <td>{{this.category}}</td>
                     <td>{{this.thumbnail}}</td>
                     <td>{{this.status}}</td>
-                    <td>{{this.id}}</td>
+                    <td>{{this._id}}</td>
                 </tr>
             {{/each}}
         </tbody>
     </table> <br>
 </div>
+<div class="container text-center">
+    <button onclick="window.location.href='http://localhost:8080'">Inicio</button>
+    <button onclick="window.location.href='http://localhost:8080/products'">Ver Productos</button>
+    <button onclick="window.location.href='http://localhost:8080/chat'">chat</button>
+    </div>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/realTimeProducts.js"></script>

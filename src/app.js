@@ -1,33 +1,49 @@
-import express from 'express'
+import express, { urlencoded } from 'express'
+import mongoose from 'mongoose'
 import handlebars from 'express-handlebars'
-import cartsRouter from './routers/cart.router.js'
-import productsRouter from './routers/products.router.js'
-import viewRouter from './routers/view.router.js'
+import { cartsRouter, productsRouter, viewRouter, chatRouter } from './routers/index.js'
 import { Server } from 'socket.io'
 
 const app = express()
 
 app.use( express.json() )
+app.use( urlencoded({ extended: true }))
+
 app.engine( 'handlebars', handlebars.engine() )
 app.set( 'views', './src/views' )
 app.set( 'view engine', 'handlebars' )
 
-
 app.use( express.static('./src/public') )
 
-
-app.use( '/products/', viewRouter )
 app.use( '/api/products', productsRouter )
 app.use( '/api/carts', cartsRouter ) 
+app.use( '/api/chat', chatRouter ) 
+app.use( '/', viewRouter )
 
+try{
+    await mongoose.connect('mongodb+srv://lucas:lucas@cluster0.a3t0bww.mongodb.net/',{
+        dbName: 'ecommerce'
+    })
+    
+}catch(err) {
+    console.log( err.message )
+}
 
+let log = []
 const httpServer = app.listen( 8080, () => console.log('SERVER UP!!')) 
-const io = new Server( httpServer )
-
-
+const io = new Server( httpServer );
 io.on('connection', socket => {
     console.log(`Nuevo cliente conectado ${ socket.id}`) 
     socket.on('productList', data => {
         io.emit( 'updatedProducts', data )
     })
+    socket.on('logDB', data => {
+        log = data;
+        io.emit('log', log.reverse())
+    })
+    socket.on('message', data => {
+        log.push( data );
+        io.emit('log', log.reverse())
+    })
 })
+

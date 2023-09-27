@@ -1,7 +1,7 @@
 import fs from 'fs';
 
 
-export class ProductManager {
+export class ProductManagerFS {
     #_path;
     constructor( path ){
         this.#_path = path;
@@ -55,17 +55,17 @@ export class ProductManager {
     }
     
     async updateProduct( id, product){
-        
+        //! ERROR HANDLER
         const { title, description, price, thumbnail, code, stock, category, status=true } = product
         if ( product.id ) throw 'Don´t have to send an ID in the body petition'
         if ( !id || ( !title && !description && !price && !thumbnail && !code && !stock && !category ) ) throw 'Must be an ID and property to change like => {stock:222, description: "Hello World"}'
         const products = await this.#prodJSON();
-        const isRepeteadCode = products.some( p => p.code === code )
-        if ( isRepeteadCode ) throw `Code must be unique: ${ code }`
         const indexProd = products.findIndex( p => p.id === id )
         if ( indexProd  < 0 ) throw `Din't found the ID: ${ id }`
+        const isRepeteadCode = products.some( p => p.code === code )  
+        if ( isRepeteadCode ) throw `Code must be unique: ${ code }`
         
-        
+        //? SOULUTION
         for ( const prop in products[indexProd] ) {
             products[indexProd][prop] = product[prop] ?? products[indexProd][prop]
         }

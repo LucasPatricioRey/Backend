@@ -1,31 +1,42 @@
 import { Router } from "express";
-import { ProductManager } from "../products_manager.js";
-import { routProductJSON } from "../routesJSON/routes.js";
-import multer from "multer"
 
-const productsManager = new ProductManager( routProductJSON )
+import { ProductManagerDB } from "../dao/db/products_managerDB.js";
+
+// import { routProductJSON } from "../routesJSON/routes.js";
+// import { ProductManagerFS } from "../dao/fs/products_managerFS.js";
+// const productsManagerFS = new ProductManagerFS(routProductJSON);
+
+
+const productsManagerDB = new ProductManagerDB();
 
 const router = Router();
 
-const storage = multer.diskStorage({
-    destination: function( req, file, cb ){
-        cb( null, 'public/' )
-    },
-    filename: function( req, file, cb ){
-        cb( null, file.originalname )
-    }
-})
-const uploader = multer({ storage });
 
-router.get('/', async( req, res ) => {
-    const products = await productsManager.getProducts()
-    res.render('home', { products })
+//! INDEX
+
+router.get('/', async(req, res) => {
+  res.render('index')
 })
 
-router.get('/realtimeproducts', async( req, res ) => {
-    const products = await productsManager.getProducts()
-    res.render('realTimeProducts',{ products })
+//! PRODUCTS
+router.get("/products", async (req, res) => {
+  const products = await productsManagerDB.getProducts()
+  res.render("home", { products });
+});
+
+router.get("/products/realtimeproducts", async (req, res) => {
+  const products = await productsManagerDB.getProducts();
+  res.render("realTimeProducts", { products });
+});
+
+
+
+//! MESSAGES
+
+router.get('/chat', async(req, res) => {
+  res.render('chat')
 })
+
 
 
 export default router;
