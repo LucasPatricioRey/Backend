@@ -1,5 +1,6 @@
 import { Router } from "express";
 import multer from "multer";
+import { PORT } from "../app.js";
 
 import { ProductManagerDB } from "../dao/db/products_managerDB.js";
 
@@ -22,13 +23,63 @@ const storage = multer.diskStorage({
 });
 const uploader = multer({ storage });
 
+export const getProducts = async (req, res) => {
+  try {
+    const limit = req.query.limit;
+    const page = req.query.page;
+    const sort = req.query.sort;
+    const stock = req.query.stock;
+    const category = req.query.category;
+    
+    const result = await productsManagerDB.paginate({ stock, category },{ limit, page, sort });
+    const originalUrl = req.originalUrl.at(-1) === '/' ? req.originalUrl.pop() : req.originalUrl;
+    const andOrQuestion = originalUrl === '/products' ? '?' : '&';
+
+    let prevLink;
+    if ( !page ){
+      prevLink = `http://${req.hostname}:${PORT}${originalUrl}${andOrQuestion}page=${result.prevPage}`;
+    } else {
+      const modifyLink = originalUrl.replace(`page=${req.query.page}`,`page=${result.prevPage}`);
+      prevLink = `http://${ req.hostname }:${PORT}${modifyLink}`;
+    }
+
+    let nextLink
+    if ( !page ){
+      nextLink = `http://${req.hostname}:${PORT}${originalUrl}${andOrQuestion}page=${result.nextPage}`;
+    } else {
+      const modifyLink = originalUrl.replace(`page=${req.query.page}`,`page=${result.nextPage}`);
+      nextLink = `http://${ req.hostname }:${PORT}${modifyLink}`;
+    }
+
+    return {
+      status: 'success',
+      payload: result.docs,
+      totalPages: result.totalPages,
+      prevPage: result.prevPage,
+      nextPage: result.nextPage,
+      page: result.page,
+      hasPrevPage: result.hasPrevPage,
+      hasNextPage: result.hasNextPage,
+      prevLink,
+      nextLink
+    };
+    
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      error: err,
+      description: "No se encuentran los products por el momento",
+    });
+  }
+}
 
 router.get("/", async (req, res) => {
   try {
-    const result = await productsManagerDB.getProducts();
-    const limit = req.query.limit;
-    res.status(200).json({ payload: result.slice(0, limit) });
-    
+    // const result = await productsManagerDB.getProducts();
+    const result = await getProducts(req, res);  
+
+    res.status(200).json(result);
+
   } catch (err) {
     res.status(500).json({
       status: "error",
@@ -64,9 +115,7 @@ router.get("/query/:pcode", async (req, res) => {
 router.post("/", uploader.single("thumbnail"), async (req, res) => {
   try {
     const product = JSON.parse(JSON.stringify(req.body));
-    console.log( product )
     const url = req.file?.filename;
-    console.log( req.file )
     product.thumbnail = url ? `${Date.now()}-${url}` : undefined;
     product.price = +product.price;
     product.stock = +product.stock;
@@ -83,14 +132,12 @@ router.put("/:pid", uploader.single("thumbnail"), async (req, res) => {
   try {
     const id = req.params.pid;
     const product = req.body;
-    console.log( id, req.file )
 
     const url = req.file?.filename;
     product.thumbnail = url ? `${Date.now()}-${url}` : ['without image'];
     product.price = +product.price;
     product.stock = +product.stock;
     product.status = product.status === "true";
-    console.log( id, product )
 
     // await productManagerFS.updateProduct(id, product);
     await productsManagerDB.updateProduct( id, product );
@@ -102,13 +149,10 @@ router.put("/:pid", uploader.single("thumbnail"), async (req, res) => {
 
 router.delete("/:pid", async (req, res) => {
   const id = req.params.pid;
-  console.log( id )
+
   try {
     await productsManagerDB.deleteProduct(id);
-
-    
     const products = await productsManagerDB.getProducts();
-
     res.json({ payload: products });
 
   } catch (err) {

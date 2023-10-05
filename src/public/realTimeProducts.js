@@ -68,7 +68,7 @@ createBtn.addEventListener("click", (evt) => {
       if (result.status === "error") throw new Error(result.error);
       socket.emit("productList", result.payload);
       alert(
-        `Ok. Todo salió bien! :) \nEl producto se ha agregado con éxito!\n \nVista actuallizada`
+        `Ok. Todo salió bien! :) \nEl producto se ha agregado con éxito!\n \nVista actualizada`
       );
       cleanInputs("add");
     })
@@ -91,7 +91,7 @@ updateBtn.addEventListener("click", () => {
       if (result.status === "error") throw new Error(result.error);
       socket.emit("productList", result.payload);
       alert(
-        `Ok. Todo salió bien! :) \nEl producto se ha agregado con éxito!\n \nVista actuallizada`
+        `Ok. Todo salió bien! :) \nEl producto se ha agregado con éxito!\n \nVista actualizada`
       );
       cleanInputs("add");
     })

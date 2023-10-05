@@ -1,20 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
 <div class="container">
-    <h1 class="text-center">PRODUCTS</h1>
-    <hr class="mb-4">
-
-    <div class="pb-3 text-center" id="pagination">
-        {{#if hasPrevPage}}
-        <a class="btn btn-primary" href="{{prevLink}}"><</a>
-        {{/if}}
-        <div class="d-inline p-3">
-            {{page}}
-        </div>
-        {{#if hasNextPage}}
-        <a class="btn btn-primary" href="{{nextLink}}">></a>
-        {{/if}}
-    </div>
+    <h1 class="text-center">CART ID: {{cartId}}</h1>
     <hr class="mb-4">
 
     <table class="table table-striped-columns">
@@ -36,7 +21,7 @@
             {{#each products}}
                 <tr>
                     <td class="text-nowrap px-1">
-                        <button onclick="addToCart('{{this._id}}')" class="btn btn-success">Add To Cart</button>
+                        <button onclick="" class="btn btn-danger">Delete To Cart</button>
                     </td>
                     <td>{{this.title}}</td>
                     <td>{{this.description}}</td>
@@ -51,5 +36,7 @@
             {{/each}}
         </tbody>
     </table>
+    
+
+{{cart}}
 </div>
-<script src="/products.js"></script>
